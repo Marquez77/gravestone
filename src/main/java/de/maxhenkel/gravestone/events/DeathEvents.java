@@ -8,6 +8,10 @@ import de.maxhenkel.gravestone.blocks.GraveStoneBlock;
 import de.maxhenkel.gravestone.items.ObituaryItem;
 import de.maxhenkel.gravestone.tileentity.GraveStoneTileEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
@@ -65,6 +69,10 @@ public class DeathEvents {
         GraveStoneTileEntity gravestone = (GraveStoneTileEntity) tileentity;
 
         gravestone.setDeath(death);
+
+        if(player.getPersistentData().contains("fakename")) {
+            gravestone.setCustomName(Component.literal(player.getPersistentData().getString("fakename")));
+        }
 
         event.removeDrops();
     }

@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -48,6 +49,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class GraveStoneBlock extends Block implements EntityBlock, IItemBlock, SimpleWaterloggedBlock {
@@ -124,7 +126,13 @@ public class GraveStoneBlock extends Block implements EntityBlock, IItemBlock, S
             BlockEntity tileentity = world.getBlockEntity(pos);
             if (tileentity instanceof GraveStoneTileEntity) {
                 GraveStoneTileEntity grave = (GraveStoneTileEntity) tileentity;
-                grave.setCustomName(stack.getHoverName());
+                String name = stack.getHoverName().getString();
+                ServerPlayer player = world.getServer().getPlayerList().getPlayerByName(name);
+                UUID playerUUID = player.getUUID();
+                Death death = new Death.Builder(playerUUID, UUID.randomUUID()).build();
+                grave.setDeath(death);
+                String result = Optional.ofNullable(player.getPersistentData().getString("fakename")).orElse(name);
+                grave.setCustomName(Component.literal(result));
             }
         }
         super.setPlacedBy(world, pos, state, placer, stack);
@@ -300,8 +308,10 @@ public class GraveStoneBlock extends Block implements EntityBlock, IItemBlock, S
     public NonNullList<ItemStack> fillPlayerInventory(Player player, Death death) {
         NonNullList<ItemStack> additionalItems = NonNullList.create();
         fillInventory(additionalItems, death.getMainInventory(), player.getInventory().items);
-        fillInventory(additionalItems, death.getArmorInventory(), player.getInventory().armor);
+//        fillInventory(additionalItems, death.getArmorInventory(), player.getInventory().armor);
         fillInventory(additionalItems, death.getOffHandInventory(), player.getInventory().offhand);
+
+        additionalItems.addAll(death.getArmorInventory());
 
         additionalItems.addAll(death.getAdditionalItems());
         NonNullList<ItemStack> restItems = NonNullList.create();
