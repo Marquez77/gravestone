@@ -4,6 +4,7 @@ buildscript {
         maven { url = 'https://maven.maxhenkel.de/repository/public' }
         jcenter()
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
@@ -87,10 +88,6 @@ repositories {
         url = "https://modmaven.k-4u.nl"
     }
     maven {
-        name = "Hwyla"
-        url = "https://maven.tehnut.info"
-    }
-    maven {
         name = "henkelmax.public"
         url = 'https://maven.maxhenkel.de/repository/public'
     }
@@ -103,7 +100,8 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}:${jei_version}")
 
-    compile fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
 
     shadow fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}:api")
     runtimeOnly fg.deobf("de.maxhenkel.corelib:corelib:${mod_minecraft_version}-${corelib_version}")
