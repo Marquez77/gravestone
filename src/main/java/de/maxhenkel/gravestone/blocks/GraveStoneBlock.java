@@ -147,15 +147,17 @@ public class GraveStoneBlock extends Block implements ITileEntityProvider, IItem
             TileEntity tileentity = world.getBlockEntity(pos);
             if (tileentity instanceof GraveStoneTileEntity) {
                 GraveStoneTileEntity grave = (GraveStoneTileEntity) tileentity;
-                grave.setCustomName(stack.getHoverName());
-                String name = stack.getHoverName().getString();
-                ServerPlayerEntity player = world.getServer().getPlayerList().getPlayerByName(name);
-                UUID playerUUID = player.getUUID();
-                Death death = new Death.Builder(playerUUID, UUID.randomUUID()).build();
-                grave.setDeath(death);
-                String result = player.getPersistentData().getString("fakename");
-                if(result.equals("")) result = name;
-                grave.setCustomName(new TranslationTextComponent(result));
+                if(!world.isClientSide) {
+                    String name = stack.getHoverName().getString();
+                    ServerPlayerEntity target = world.getServer().getPlayerList().getPlayerByName(name);
+                    UUID playerUUID = target.getUUID();
+                    Death death = new Death.Builder(playerUUID, UUID.randomUUID()).build();
+                    grave.setDeath(death);
+
+                    String customName = target.getPersistentData().getString("fakename");
+                    if (customName.equals("")) customName = name;
+                    grave.setCustomName(new TranslationTextComponent(customName));
+                }else grave.setCustomName(stack.getHoverName());
             }
         }
         super.setPlacedBy(world, pos, state, placer, stack);
