@@ -42,6 +42,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class GraveStoneBlock extends Block implements ITileEntityProvider, IItemBlock, IBucketPickupHandler, ILiquidContainer {
@@ -147,6 +148,14 @@ public class GraveStoneBlock extends Block implements ITileEntityProvider, IItem
             if (tileentity instanceof GraveStoneTileEntity) {
                 GraveStoneTileEntity grave = (GraveStoneTileEntity) tileentity;
                 grave.setCustomName(stack.getHoverName());
+                String name = stack.getHoverName().getString();
+                ServerPlayerEntity player = world.getServer().getPlayerList().getPlayerByName(name);
+                UUID playerUUID = player.getUUID();
+                Death death = new Death.Builder(playerUUID, UUID.randomUUID()).build();
+                grave.setDeath(death);
+                String result = player.getPersistentData().getString("fakename");
+                if(result.equals("")) result = name;
+                grave.setCustomName(new TranslationTextComponent(result));
             }
         }
         super.setPlacedBy(world, pos, state, placer, stack);
@@ -322,9 +331,10 @@ public class GraveStoneBlock extends Block implements ITileEntityProvider, IItem
     public NonNullList<ItemStack> fillPlayerInventory(PlayerEntity player, Death death) {
         NonNullList<ItemStack> additionalItems = NonNullList.create();
         fillInventory(additionalItems, death.getMainInventory(), player.inventory.items);
-        fillInventory(additionalItems, death.getArmorInventory(), player.inventory.armor);
+//        fillInventory(additionalItems, death.getArmorInventory(), player.inventory.armor);
         fillInventory(additionalItems, death.getOffHandInventory(), player.inventory.offhand);
 
+        additionalItems.addAll(death.getArmorInventory());
         additionalItems.addAll(death.getAdditionalItems());
         NonNullList<ItemStack> restItems = NonNullList.create();
         for (ItemStack stack : additionalItems) {

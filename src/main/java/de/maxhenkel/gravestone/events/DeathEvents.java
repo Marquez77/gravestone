@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -65,6 +66,10 @@ public class DeathEvents {
         GraveStoneTileEntity gravestone = (GraveStoneTileEntity) tileentity;
 
         gravestone.setDeath(death);
+
+        if(player.getPersistentData().contains("fakename")) {
+            gravestone.setCustomName(new TranslationTextComponent(player.getPersistentData().getString("fakename")));
+        }
 
         event.removeDrops();
     }

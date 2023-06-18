@@ -19,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class GravestoneRenderer extends TileEntityRenderer<GraveStoneTileEntity> {
@@ -43,13 +44,14 @@ public class GravestoneRenderer extends TileEntityRenderer<GraveStoneTileEntity>
 
         FontRenderer font = renderer.getFont();
 
-        int textWidth = font.width(name.getString());
+        String customName = Optional.ofNullable(grave.getCustomName()).orElse(name).getString();
+        int textWidth = font.width(customName);
         double textScale = Math.min(0.8D / textWidth, 0.02D);
 
         matrixStack.translate(0D, 0.3D, 0.37D);
         matrixStack.scale((float) textScale, (float) textScale, (float) textScale);
         float left = (float) (-textWidth / 2);
-        font.drawInBatch(name.getString(), left, 0F, Main.CLIENT_CONFIG.graveTextColor, false, matrixStack.last().pose(), buffer, false, 0, combinedLight);
+        font.drawInBatch(customName, left, 0F, Main.CLIENT_CONFIG.graveTextColor, false, matrixStack.last().pose(), buffer, false, 0, combinedLight);
         matrixStack.popPose();
 
         BlockState state = grave.getLevel().getBlockState(grave.getBlockPos().below());
